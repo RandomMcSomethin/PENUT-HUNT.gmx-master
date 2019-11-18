@@ -29,9 +29,16 @@
 image_speed = 1/6;
 xspeed = -1;
 hp = 20;
-playSFX(snd_roar);
 phase = 1;
 phaseTimer = 0;
+timer = 0;
+jumping = false;
+jumpProgress = 0;
+jumps = 0;
+
+startTimer = 300;
+hbTimer = 0;
+state = 2; //0 = pre-intro, 1 = intro 2 = fight
 </string>
           </argument>
         </arguments>
@@ -54,38 +61,183 @@ phaseTimer = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>image_xscale = 1;
-x += xspeed;
+            <string>x += xspeed;
 y += yspeed;
-if (place_meeting(x + xspeed, y, prt_solid)) xspeed = -xspeed;
-if (place_meeting(x, y + yspeed, prt_solid)) yspeed = -yspeed;
-
-//Footstep
-phaseTimer++;
-switch phase {
-    case 1: 
-        if (phaseTimer == 10) {
-            sprite_index = spr_minotaurlord_walk;
-        }
-        if (phaseTimer &gt; 10) {
-            if (image_index == 3 &amp;&amp; sprite_index = spr_minotaurlord_walk) {
-                xspeed = -1;
-            }
-            if (image_index == 4) {
-                playSFX(snd_smallexplosion);
-            }
-            if (image_index == 5) {
-                xspeed = 0;
-            }
-            if (image_index == 6) {
-                sprite_index = spr_minotaurlord_idle;
-            }
-        }
-        if (phaseTimer &gt;= 60) {
-            phaseTimer = 0;
-        }
-    break;
+if (!jumping) {
+    if (place_meeting(x + xspeed, y, prt_solid)) xspeed = -xspeed;
+    if (place_meeting(x, y + yspeed, prt_solid)) yspeed = -yspeed;
 }
+
+startTimer--;
+collision = !jumping;
+canHit = !jumping;
+
+//Intro
+if (startTimer == 0) {
+    state = 1;
+}
+
+if (startTimer == -90) {
+    playSFX(snd_roar);
+    sprite_index = spr_minotaurlord_roar;
+    playMusic(mus_boss1);
+}
+
+if (startTimer &lt; -90 &amp;&amp; startTimer &gt; -180) {
+    healthbar();
+}
+
+if (startTimer == -180) {
+    state = 2;
+    phase = 2;
+    phaseTimer = 0;
+}
+
+//Fight
+if (state == 0 || state == 2) {
+    phaseTimer++;
+    timer++;
+    
+    switch phase {
+        //Footstep
+        case 1: 
+            image_speed = 1/6;
+            if (xspeed != 0) image_xscale = -sign(xspeed);
+            if (phaseTimer == 10) {
+                sprite_index = spr_minotaurlord_walk;
+            }
+            if (phaseTimer &gt; 10) {
+                if (image_index == 3 &amp;&amp; sprite_index = spr_minotaurlord_walk) {
+                    if (instance_exists(obj_elephant)) {
+                        moveTowardsPoint(obj_elephant.x, obj_elephant.y, 1);
+                    }
+                }
+                if (image_index == 4) {
+                    playSFX(snd_smallexplosion);
+                }
+                if (image_index == 5) {
+                    xspeed = 0;
+                    yspeed = 0;
+                }
+                if (image_index == 6) {
+                    sprite_index = spr_minotaurlord_idle;
+                }
+            }
+            if (phaseTimer &gt;= 60) {
+                phaseTimer = 0;
+            }
+        if (timer == 300) {
+            phase = 3;
+            phaseTimer = 0;
+            sprite_index = spr_minotaurlord_idle;
+            xspeed = 0;
+        }
+        break;
+        //Jumping
+        case 2:
+            image_xscale = 1;
+            image_speed = 1/6;
+            if (phaseTimer == 30 &amp;&amp; !jumping) { //Leading up to a jump
+                jumping = true;
+                phaseTimer = 0;
+                jumps++;
+                sprite_index = spr_minotaurlord_shadow;
+                if (instance_exists(obj_elephant)) {
+                    moveTowardsPoint(obj_elephant.x, obj_elephant.y, 3*(jumps/2));
+                }
+            }
+            
+            if (jumping) { //Juuuummp
+                jumpProgress = sin(degtorad(phaseTimer*3));
+                if (jumpProgress &lt; 0) {
+                    jumping = false;
+                    phaseTimer = 0;
+                    jumpProgress = 0;
+                    sprite_index = spr_minotaurlord_idle;
+                    playSFX(snd_bigexplosion);
+                    xspeed = 0;
+                    yspeed = 0;
+                    if (jumps == 3) {
+                        phase = 1;
+                        timer = 0;
+                        phaseTimer = 0;
+                        jumps = 0;
+                    }
+                } 
+            }
+        break;
+        //Axe Throw
+        case 3:
+        image_xscale = 1;
+            if (phaseTimer == 30 &amp;&amp; !jumping) { //Leading up to a jump
+                jumping = true;
+                phaseTimer = 0;
+                sprite_index = spr_minotaurlord_shadow;
+                if (instance_exists(obj_elephant)) {
+                    moveTowardsPoint(room_width/2, room_height/2, 5);
+                }
+            }
+            
+            if (jumping) { //Juuuummp (again)
+                jumpProgress = sin(degtorad(phaseTimer*3));
+                if (jumpProgress &lt; 0) {
+                    jumping = false;
+                    jumpProgress = 0;
+                    sprite_index = spr_minotaurlord_idle;
+                    playSFX(snd_bigexplosion);
+                    xspeed = 0;
+                    yspeed = 0;
+                } 
+            }
+            
+            if (phaseTimer == 150) {
+                image_speed = 0;
+                sprite_index = spr_minotaurlord_throw;
+                image_index = 0;
+            }
+            if (phaseTimer == 210) {
+                image_index = 1;
+                playSFX(snd_axethrow);
+                var a = instance_create(x, y, obj_minotauraxe);
+            }
+        break;
+    }
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>if (!jumping) draw_self();
+else {
+    draw_set_blend_mode(bm_subtract);
+    draw_ellipse_colour(
+    x - (1 - jumpProgress)*sprite_width/3 - 10, 
+    y + sprite_height/2 - (1 - jumpProgress)*sprite_height/8, 
+    x + (1 - jumpProgress)*sprite_width/3 + 10, 
+    y + sprite_height/2 + (1 - jumpProgress)*sprite_height/8,
+    c_dkgray, c_dkgray, false);
+    draw_set_blend_mode(bm_normal);
+    draw_sprite(spr_minotaurlord_idle, 0, x, y - jumpProgress*100);
+}
+
 </string>
           </argument>
         </arguments>

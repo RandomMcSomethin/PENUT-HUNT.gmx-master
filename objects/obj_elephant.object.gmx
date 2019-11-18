@@ -3,7 +3,7 @@
   <spriteName>spr_elephant</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>0</depth>
+  <depth>5</depth>
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -29,6 +29,7 @@
 xspeed = 0;
 yspeed = 0;
 cooldown = 20;
+collectCooldown = 5;
 </string>
           </argument>
         </arguments>
@@ -60,11 +61,14 @@ if (keyboard_check(KEY_RIGHT)) xspeed = 3;
 playerPhysics();
 if (xspeed != 0) image_xscale = sign(xspeed);
 
+if (collectCooldown &lt; 5) collectCooldown++;
+
 //Death
-if (place_meeting(x, y, prt_enemy)) {
+var i;
+i = instance_place(x, y, prt_enemy);
+if (i != noone &amp;&amp; i.collision == true) {
     event_user(0);
 }
-
 if (cooldown &lt; 20) cooldown++;
 
 //Firing Penuts

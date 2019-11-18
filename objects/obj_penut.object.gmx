@@ -3,7 +3,7 @@
   <spriteName>spr_penut</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>0</depth>
+  <depth>7</depth>
   <persistent>0</persistent>
   <parentName>prt_pickup</parentName>
   <maskName>&lt;undefined&gt;</maskName>

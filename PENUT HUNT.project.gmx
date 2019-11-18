@@ -13,6 +13,9 @@
     <sound>sound\snd_fire</sound>
     <sound>sound\snd_roar</sound>
     <sound>sound\snd_1up</sound>
+    <sound>sound\mus_boss1</sound>
+    <sound>sound\snd_axethrow</sound>
+    <sound>sound\snd_lifebar</sound>
   </sounds>
   <sprites name="sprites">
     <sprite>sprites\spr_elephant</sprite>
@@ -27,6 +30,10 @@
     <sprite>sprites\spr_minotaurlord_walk</sprite>
     <sprite>sprites\spr_minotaurlord_throw</sprite>
     <sprite>sprites\spr_minotaurlord_idle</sprite>
+    <sprite>sprites\spr_minotaurlord_roar</sprite>
+    <sprite>sprites\spr_minotaurlord_shadow</sprite>
+    <sprite>sprites\spr_penutbox</sprite>
+    <sprite>sprites\spr_minotauraxe</sprite>
   </sprites>
   <backgrounds name="background">
     <background>background\bg_error</background>
@@ -35,9 +42,12 @@
   <paths name="paths"/>
   <scripts name="scripts">
     <script>scripts\playMusic.gml</script>
+    <script>scripts\stopMusic.gml</script>
     <script>scripts\playSFX.gml</script>
     <script>scripts\error.gml</script>
     <script>scripts\playerPhysics.gml</script>
+    <script>scripts\moveTowardsPoint.gml</script>
+    <script>scripts\healthbar.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\font_comicsans</font>
@@ -55,10 +65,12 @@
     <object>objects\prt_pickup</object>
     <object>objects\obj_level</object>
     <object>objects\obj_minotaurlord</object>
+    <object>objects\obj_minotauraxe</object>
     <object>objects\prt_enemy</object>
     <object>objects\prt_playerprojectile</object>
     <object>objects\obj_explosion</object>
     <object>objects\obj_smallexplosion</object>
+    <object>objects\spr_penutspawner</object>
   </objects>
   <rooms name="rooms">
     <room>rooms\rm_title</room>

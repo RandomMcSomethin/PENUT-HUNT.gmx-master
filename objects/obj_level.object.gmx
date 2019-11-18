@@ -31,6 +31,7 @@ roomNum = 1;
 ini_open("save.ini");
 ini_close();
 lvlText = "Welcome to Penut Hunt!";
+bossLevel = false;
 </string>
           </argument>
         </arguments>
@@ -53,7 +54,7 @@ lvlText = "Welcome to Penut Hunt!";
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>if (instance_number(obj_penut) == 0) {
+            <string>if (instance_number(obj_penut) == 0 &amp;&amp; !bossLevel) {
     ini_open("save.ini");
     ini_write_real("General", "Penuts", penuts + MANAGER.totalPenuts);
     ini_write_real("General", "Level", roomNum + 1);
